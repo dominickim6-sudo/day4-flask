@@ -15,7 +15,7 @@
       <article class="post-item">
         <div>
           <p class="meta">{{ post.created_at }}</p>
-          <h2>{{ post.title }}</h2>
+          <h2><a href="{{ url_for('post_detail', post_id=post.id) }}" class="post-link">{{ post.title }}</a></h2>
           <p class="excerpt">{{ post.content }}</p>
         </div>
       </article>

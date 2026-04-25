@@ -134,6 +134,31 @@ a {
   overflow: hidden;
 }
 
+.post-link:hover {
+  color: var(--primary);
+}
+
+.post-content {
+  margin-top: 12px;
+  white-space: pre-wrap;
+}
+
+.post-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-danger {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #991b1b;
+}
+
 .editor {
   max-width: 720px;
   margin: 0 auto;

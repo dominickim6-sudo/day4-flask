@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, flash, g, make_response, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, g, make_response, redirect, render_template, request, url_for
 
 app = Flask(__name__, instance_relative_config=True)
 app.config["DATABASE"] = Path(app.instance_path) / "board.db"
@@ -55,6 +55,16 @@ def list_posts():
     return response
 
 
+def get_post_or_404(post_id):
+    post = get_db().execute(
+        "SELECT id, title, content, created_at FROM posts WHERE id = ?",
+        (post_id,),
+    ).fetchone()
+    if post is None:
+        abort(404)
+    return post
+
+
 def save_post(title, content):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M")
     db = get_db()
@@ -69,17 +79,75 @@ def save_post(title, content):
 @app.route("/posts/new/", methods=["GET", "POST"])
 def new_post():
     if request.method == "GET":
-        return render_template("posts/create.html")
+        return render_template("posts/create.html", post=None, form_action=url_for("new_post"), submit_label="Publish")
 
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
 
-    if not title or not content:
-        flash("제목과 내용을 모두 입력해 주세요.")
-        return render_template("posts/create.html", title=title, content=content), 400
+    if not title and not content:
+        flash("제목 또는 내용을 입력해 주세요.")
+        return render_template(
+            "posts/create.html",
+            post={"title": title, "content": content},
+            form_action=url_for("new_post"),
+            submit_label="Publish",
+        ), 400
+
+    if not title:
+        title = "(제목 없음)"
 
     save_post(title, content)
     flash("게시글이 등록되었습니다.")
+    return redirect(url_for("list_posts"))
+
+
+@app.route("/posts/<int:post_id>")
+def post_detail(post_id):
+    post = get_post_or_404(post_id)
+    return render_template("posts/detail.html", post=post)
+
+
+@app.route("/posts/<int:post_id>/edit")
+def edit_post(post_id):
+    post = get_post_or_404(post_id)
+    return render_template(
+        "posts/create.html",
+        post=post,
+        form_action=url_for("update_post", post_id=post_id),
+        submit_label="Update",
+    )
+
+
+@app.route("/posts/<int:post_id>/update", methods=["POST"])
+def update_post(post_id):
+    get_post_or_404(post_id)
+    title = request.form.get("title", "").strip()
+    content = request.form.get("content", "").strip()
+
+    if not title and not content:
+        flash("제목 또는 내용을 입력해 주세요.")
+        return redirect(url_for("edit_post", post_id=post_id))
+
+    if not title:
+        title = "(제목 없음)"
+
+    db = get_db()
+    db.execute(
+        "UPDATE posts SET title = ?, content = ? WHERE id = ?",
+        (title, content, post_id),
+    )
+    db.commit()
+    flash("게시글이 수정되었습니다.")
+    return redirect(url_for("post_detail", post_id=post_id))
+
+
+@app.route("/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id):
+    get_post_or_404(post_id)
+    db = get_db()
+    db.execute("DELETE FROM posts WHERE id = ?", (post_id,))
+    db.commit()
+    flash("게시글이 삭제되었습니다.")
     return redirect(url_for("list_posts"))
 
 
@@ -93,9 +161,12 @@ def create_post_legacy():
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
 
-    if not title or not content:
-        flash("제목과 내용을 모두 입력해 주세요.")
+    if not title and not content:
+        flash("제목 또는 내용을 입력해 주세요.")
         return redirect(url_for("new_post"))
+
+    if not title:
+        title = "(제목 없음)"
 
     save_post(title, content)
     flash("게시글이 등록되었습니다.")
