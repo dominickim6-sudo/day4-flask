@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -5,8 +6,9 @@ from pathlib import Path
 from flask import Flask, abort, flash, g, make_response, redirect, render_template, request, url_for
 
 app = Flask(__name__, instance_relative_config=True)
-app.config["DATABASE"] = Path(app.instance_path) / "board.db"
-app.secret_key = "dev"
+database_path = os.environ.get("DATABASE_PATH")
+app.config["DATABASE"] = Path(database_path) if database_path else Path(app.instance_path) / "board.db"
+app.secret_key = os.environ.get("SECRET_KEY", "dev")
 
 
 def get_db():
@@ -24,7 +26,7 @@ def close_db(exception):
 
 
 def init_db():
-    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+    Path(app.config["DATABASE"]).parent.mkdir(parents=True, exist_ok=True)
     db = get_db()
     with app.open_resource("schema.sql") as schema_file:
         db.executescript(schema_file.read().decode("utf8"))
@@ -174,4 +176,7 @@ def create_post_legacy():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", "5000"))
+    debug = os.environ.get("FLASK_DEBUG", "1") == "1"
+    app.run(host=host, port=port, debug=debug)
