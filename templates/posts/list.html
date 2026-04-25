@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Posts · Quietude{% endblock %}
+
+{% block content %}
+<section class="hero card">
+  <p class="meta">Focused writing space</p>
+  <h1>Latest Entries</h1>
+  <p class="subtitle">미니멀 다크 테마로 구성된 게시판입니다.</p>
+</section>
+
+<section class="post-list">
+  {% if posts %}
+    {% for post in posts %}
+      <article class="post-item">
+        <div>
+          <p class="meta">{{ post.created_at }}</p>
+          <h2>{{ post.title }}</h2>
+          <p class="excerpt">{{ post.content }}</p>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div class="card empty">
+      <p>아직 게시글이 없습니다. 첫 글을 작성해보세요.</p>
+      <a href="{{ url_for('new_post') }}" class="btn btn-primary">글쓰기</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

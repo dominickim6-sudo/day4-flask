@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Write · Quietude{% endblock %}
+
+{% block content %}
+<section class="editor card">
+  <h1>New Post</h1>
+  <p class="subtitle">생각을 정리해 게시글로 남겨보세요.</p>
+  <p class="meta">저장되면 목록(/)으로 자동 이동합니다.</p>
+
+  <form action="{{ url_for('new_post') }}" method="post" class="form">
+    <label for="title">제목</label>
+    <input id="title" name="title" type="text" value="{{ title|default('') }}" placeholder="Post Title" required>
+
+    <label for="content">내용</label>
+    <textarea id="content" name="content" rows="12" placeholder="Tell your story..." required>{{ content|default('') }}</textarea>
+
+    <div class="actions">
+      <a href="{{ url_for('list_posts') }}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Publish</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
