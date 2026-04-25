@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "surface-bright": "#393939",
+                    "inverse-surface": "#e5e2e1",
+                    "inverse-primary": "#494bd6",
+                    "secondary-fixed": "#d4e4fa",
+                    "surface-container-low": "#1c1b1b",
+                    "primary-fixed": "#e1e0ff",
+                    "on-tertiary-container": "#452000",
+                    "tertiary-fixed-dim": "#ffb783",
+                    "on-tertiary-fixed-variant": "#703700",
+                    "on-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "surface-dim": "#131313",
+                    "on-primary-container": "#0d0096",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#a7b6cc",
+                    "on-surface-variant": "#c7c4d7",
+                    "surface-container-highest": "#353534",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "on-error-container": "#ffdad6",
+                    "on-background": "#e5e2e1",
+                    "on-tertiary-fixed": "#301400",
+                    "outline": "#908fa0",
+                    "secondary-container": "#39485a",
+                    "on-primary-fixed": "#07006c",
+                    "on-secondary-fixed": "#0d1c2d",
+                    "surface-tint": "#c0c1ff",
+                    "tertiary-fixed": "#ffdcc5",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary": "#ffb783",
+                    "surface-variant": "#353534",
+                    "secondary": "#b9c8de",
+                    "on-secondary": "#233143",
+                    "surface-container": "#201f1f",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary-fixed-dim": "#b9c8de",
+                    "background": "#131313",
+                    "on-secondary-fixed-variant": "#39485a",
+                    "primary-container": "#8083ff",
+                    "primary": "#c0c1ff",
+                    "inverse-on-surface": "#313030",
+                    "on-primary": "#1000a9",
+                    "outline-variant": "#464554",
+                    "surface": "#131313",
+                    "tertiary-container": "#d97721",
+                    "on-tertiary": "#4f2500"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "stack-lg": "48px",
+                    "content-width": "720px",
+                    "stack-xl": "80px",
+                    "margin-mobile": "16px",
+                    "stack-sm": "12px",
+                    "stack-md": "24px",
+                    "container-max": "1120px"
+            },
+            "fontFamily": {
+                    "display": ["Inter"],
+                    "label-md": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "h2": ["Inter"],
+                    "caption": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.75", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #121212; color: #e5e2e1; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .reading-progress { position: fixed; top: 0; left: 0; height: 2px; width: 45%; z-index: 100; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md">
+<!-- Reading Progress Bar -->
+<div class="reading-progress bg-primary"></div>
+<!-- Top Navigation Shell (Quietude Branding) -->
+<header class="bg-[#121212] border-b border-[#262626] fixed top-0 w-full z-40">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-[1120px] mx-auto">
+<span class="font-display text-xl font-bold tracking-tighter text-neutral-100">Quietude</span>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-neutral-400" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-gutter max-w-[720px] mx-auto">
+<!-- Post Header -->
+<article>
+<header class="mb-stack-md">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-2 py-1 bg-secondary-container/20 text-on-secondary-container font-caption text-caption rounded">PHILOSOPHY</span>
+<span class="text-neutral-500 font-caption text-caption">8 min read</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-background mb-4">The Architecture of Silence: Designing for Intellectual Depth</h1>
+<div class="flex items-center gap-3 py-4 border-b border-[#262626]">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a male writer in a dark turtleneck against a neutral studio background with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrobRX0SVSfsM1lsua6dzOzD4O2jEpVtlgm7vEnA0ZPoc-tO5E0OttuZ6PoCnKUjLtRdsbLkZvklfq6V7vWC6u9uOYRvgSZvlENQCgAgD_yzcSHyB2-5s5b1pwaWVaLXr9jtlmC3KYFlClz53_ooLQvJsxZbogpbx9KDik5CIuczVO5WJHGJxDlAR7EktHMrkU1EodrBL9lXKhV3a4bh0jnq14r7ZrumgpdQ1c2IBEa1dc4Y0wA4AzVGG3eVXHAyt7Ee4g6P-RiQ97"/>
+</div>
+<div>
+<p class="font-label-md text-label-md text-neutral-100">Julian Vane</p>
+<p class="font-caption text-caption text-neutral-500">Published Oct 24, 2023</p>
+</div>
+</div>
+</header>
+<!-- Featured Image -->
+<figure class="mb-stack-md rounded-xl overflow-hidden border border-[#262626]">
+<img class="w-full aspect-video object-cover" data-alt="Minimalist modern interior with a single chair and a large window looking out onto a misty morning forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHn1TFJvAEx__u4YfLDTxyX14rYD-o-cVj2rZ-yD22a-fa82A3uq8oGW0v1BniR6VFfajMNcLfI3NScROi4baBlsNjZd_Tq9gqDut0ekiSGghqMoNfHIWdwfzVU42ocKRNbtGwVmY0tA85YDNoAlhAGfg2_Y4sdah2_1NLfn9ASgWJnOyDVo_i-kKANvSGcpAFZzKZDcA0uUWfV38H6rKIQaAk5ClDWkdcmde2CN7wVYo30RgGjda2Wb0wFMpHTWXgwwJcy4ke7JNI"/>
+<figcaption class="p-3 bg-surface-container-low text-neutral-500 font-caption text-caption italic">Photo by Quietude Collective</figcaption>
+</figure>
+<!-- Body Content -->
+<div class="font-body-lg text-body-lg text-neutral-300 space-y-6 leading-relaxed">
+<p>
+                    In an age of hyper-connectivity, silence is no longer just the absence of sound; it is a luxury, a deliberate design choice, and a prerequisite for profound thought. As we navigate through a digital landscape cluttered with notifications and fleeting stimuli, the spaces we inhabit—both physical and virtual—must evolve to protect our cognitive clarity.
+                </p>
+<blockquote class="pl-6 border-l-2 border-primary italic text-on-primary-container/80 my-8 py-2">
+                    "The quiet mind is not a mind that is empty, but a mind that is focused enough to perceive its own depth."
+                </blockquote>
+<p>
+                    Minimalism in UI design is often misunderstood as merely stripping away elements. True minimalism is about the hierarchy of attention. When we reduce the "noise" of unnecessary borders, aggressive gradients, and constant motion, we allow the content—the ideas—to step into the light.
+                </p>
+<h2 class="font-h2 text-h2 text-on-background mt-stack-lg mb-4">The Principle of Negative Space</h2>
+<p>
+                    Whitespace is not wasted space. It is breathing room for the eye. In the context of long-form writing, generous margins and consistent vertical rhythm act as a trellis, supporting the reader's journey without intruding upon it.
+                </p>
+</div>
+</article>
+<!-- Thumb-Friendly Action Buttons -->
+<section class="mt-stack-xl grid grid-cols-3 gap-3">
+<button class="flex flex-col items-center justify-center p-4 bg-[#181818] border border-[#262626] rounded-xl hover:bg-surface-container-high transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-neutral-400 mb-1" data-icon="arrow_back">arrow_back</span>
+<span class="font-caption text-caption text-neutral-400">Back</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-[#181818] border border-[#262626] rounded-xl hover:bg-surface-container-high transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary mb-1" data-icon="edit">edit</span>
+<span class="font-caption text-caption text-neutral-400">Edit</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-[#181818] border border-error/20 rounded-xl hover:bg-error-container/10 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-error mb-1" data-icon="delete">delete</span>
+<span class="font-caption text-caption text-neutral-400">Delete</span>
+</button>
+</section>
+</main>
+<!-- Footer Content (Quietude Aesthetic) -->
+<footer class="max-w-[720px] mx-auto py-12 px-6 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-[#262626] mb-16">
+<p class="font-caption text-caption text-neutral-500">© 2024 Quietude. Built for the focused mind.</p>
+<div class="flex gap-6">
+<a class="font-caption text-caption text-neutral-500 hover:text-indigo-400 transition-colors" href="#">Privacy</a>
+<a class="font-caption text-caption text-neutral-500 hover:text-indigo-400 transition-colors" href="#">Terms</a>
+<a class="font-caption text-caption text-neutral-500 hover:text-indigo-400 transition-colors" href="#">Archive</a>
+</div>
+</footer>
+<!-- Bottom Navigation Bar Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 pb-safe bg-[#181818]/90 backdrop-blur-md border-t border-[#262626] shadow-[0_-4px_20px_rgba(0,0,0,0.4)] z-50">
+<div class="flex flex-col items-center justify-center text-neutral-500 hover:text-neutral-200 transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="article">article</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest mt-1">Feed</span>
+</div>
+<div class="flex flex-col items-center justify-center text-indigo-400 font-bold transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="edit_note" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest mt-1">Write</span>
+</div>
+<div class="flex flex-col items-center justify-center text-neutral-500 hover:text-neutral-200 transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest mt-1">Profile</span>
+</div>
+</nav>
+</body></html>
