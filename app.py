@@ -1,15 +1,36 @@
 import os
 import sqlite3
+import uuid
 from datetime import datetime
 from pathlib import Path
 
 from flask import Flask, abort, flash, g, make_response, redirect, render_template, request, url_for
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, instance_relative_config=True)
 database_path = os.environ.get("DATABASE_PATH")
 app.config["DATABASE"] = Path(database_path) if database_path else Path(app.instance_path) / "board.db"
 app.secret_key = os.environ.get("SECRET_KEY", "dev")
 PER_PAGE = 10
+UPLOAD_FOLDER = Path("static/uploads")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def save_uploaded_image(file):
+    if not file or file.filename == "":
+        return ""
+    if not allowed_file(file.filename):
+        return ""
+    ext = secure_filename(file.filename).rsplit(".", 1)[1].lower()
+    filename = f"{uuid.uuid4().hex[:12]}.{ext}"
+    file.save(UPLOAD_FOLDER / filename)
+    return f"/static/uploads/{filename}"
 
 
 def get_db():
@@ -120,6 +141,7 @@ def new_post():
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
     image_url = request.form.get("image_url", "").strip()
+    image_file = request.files.get("image")
 
     if not title and not content:
         flash("제목 또는 내용을 입력해 주세요.")
@@ -132,6 +154,10 @@ def new_post():
 
     if not title:
         title = "(제목 없음)"
+
+    uploaded = save_uploaded_image(image_file)
+    if uploaded:
+        image_url = uploaded
 
     save_post(title, content, image_url)
     flash("게시글이 등록되었습니다.")
@@ -161,6 +187,8 @@ def update_post(post_id):
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
     image_url = request.form.get("image_url", "").strip()
+    image_file = request.files.get("image")
+    remove_image = request.form.get("remove_image")
 
     if not title and not content:
         flash("제목 또는 내용을 입력해 주세요.")
@@ -168,6 +196,12 @@ def update_post(post_id):
 
     if not title:
         title = "(제목 없음)"
+
+    uploaded = save_uploaded_image(image_file)
+    if uploaded:
+        image_url = uploaded
+    elif remove_image:
+        image_url = ""
 
     db = get_db()
     db.execute(
@@ -181,7 +215,11 @@ def update_post(post_id):
 
 @app.route("/posts/<int:post_id>/delete", methods=["POST"])
 def delete_post(post_id):
-    get_post_or_404(post_id)
+    post = get_post_or_404(post_id)
+    if post["image_url"] and post["image_url"].startswith("/static/uploads/"):
+        img_path = Path(post["image_url"].lstrip("/"))
+        if img_path.exists():
+            img_path.unlink()
     db = get_db()
     db.execute("DELETE FROM posts WHERE id = ?", (post_id,))
     db.commit()
