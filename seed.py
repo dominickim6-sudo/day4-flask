@@ -11,7 +11,12 @@ def seed(database_path=None):
         database_path = os.environ.get("DATABASE_PATH")
     db_path = Path(database_path) if database_path else Path("instance/board.db")
 
-    news = fetch_news(limit=10)
+    try:
+        news = fetch_news(limit=10)
+    except Exception as e:
+        print(f"뉴스 가져오기 실패: {e}")
+        return
+
     if not news:
         print("가져온 뉴스가 없습니다.")
         return
