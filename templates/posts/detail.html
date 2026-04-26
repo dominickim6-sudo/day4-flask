@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.title }} · Quietude{% endblock %}
+{% block title %}{{ post.title }} · 아직도 가야할 길{% endblock %}
 
 {% block content %}
 <section class="editor card">
   <p class="meta">{{ post.created_at }}</p>
   <h1>{{ post.title }}</h1>
+  {% if post.image_url %}
+    <img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image" loading="lazy">
+  {% endif %}
   <p class="post-content">{{ post.content }}</p>
 
   <div class="post-actions">

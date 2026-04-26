@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if post and post.id %}Edit{% else %}Write{% endif %} · Quietude{% endblock %}
+{% block title %}{% if post and post.id %}Edit{% else %}Write{% endif %} · 아직도 가야할 길{% endblock %}
 
 {% block content %}
 <section class="editor card">
@@ -14,6 +14,9 @@
 
     <label for="content">내용</label>
     <textarea id="content" name="content" rows="12" placeholder="Tell your story...">{{ (post.content if post else '')|default('') }}</textarea>
+
+    <label for="image_url">이미지 URL</label>
+    <input id="image_url" name="image_url" type="url" value="{{ (post.image_url if post else '')|default('') }}" placeholder="https://...">
 
     <div class="actions">
       <a href="{% if post and post.id %}{{ url_for('post_detail', post_id=post.id) }}{% else %}{{ url_for('list_posts') }}{% endif %}" class="btn btn-ghost">Cancel</a>

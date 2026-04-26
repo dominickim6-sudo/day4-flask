@@ -1,18 +1,64 @@
 {% extends "base.html" %}
 
-{% block title %}Posts · Quietude{% endblock %}
+{% block title %}Posts · 아직도 가야할 길{% endblock %}
 
 {% block content %}
 <section class="hero card">
   <p class="meta">Focused writing space</p>
   <h1>Latest Entries</h1>
   <p class="subtitle">미니멀 다크 테마로 구성된 게시판입니다.</p>
+  <div class="toolbar">
+    <form action="{{ url_for('list_posts') }}" method="get" class="search-form">
+      <input type="hidden" name="sort" value="{{ sort }}">
+      <input type="hidden" name="view" value="{{ view }}">
+      <input type="text" name="q" value="{{ query|default('') }}" placeholder="검색어를 입력하세요..." class="search-input">
+      <button type="submit" class="btn btn-primary">검색</button>
+    </form>
+    <div class="toolbar-right">
+      <select class="sort-select" onchange="location.href=this.value">
+        <option value="{{ url_for('list_posts', sort='newest', q=query, view=view) }}" {% if sort == 'newest' %}selected{% endif %}>최신순</option>
+        <option value="{{ url_for('list_posts', sort='oldest', q=query, view=view) }}" {% if sort == 'oldest' %}selected{% endif %}>오래된순</option>
+        <option value="{{ url_for('list_posts', sort='title', q=query, view=view) }}" {% if sort == 'title' %}selected{% endif %}>제목순</option>
+      </select>
+      <div class="view-toggle">
+        <a href="{{ url_for('list_posts', sort=sort, q=query, view='list') }}" class="view-btn {% if view == 'list' %}active{% endif %}" title="리스트">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </a>
+        <a href="{{ url_for('list_posts', sort=sort, q=query, view='card') }}" class="view-btn {% if view == 'card' %}active{% endif %}" title="카드">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="post-list">
-  {% if posts %}
+{% if posts %}
+  {% if view == 'card' %}
+  <section class="post-grid">
+    {% for post in posts %}
+      <article class="card-item">
+        {% if post.image_url %}
+          <a href="{{ url_for('post_detail', post_id=post.id) }}">
+            <img src="{{ post.image_url }}" alt="{{ post.title }}" class="card-img" loading="lazy">
+          </a>
+        {% else %}
+          <div class="card-img card-img-empty"></div>
+        {% endif %}
+        <div class="card-body">
+          <p class="meta">{{ post.created_at }}</p>
+          <h2><a href="{{ url_for('post_detail', post_id=post.id) }}" class="post-link">{{ post.title }}</a></h2>
+          <p class="excerpt">{{ post.content }}</p>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+  {% else %}
+  <section class="post-list">
     {% for post in posts %}
       <article class="post-item">
+        {% if post.image_url %}
+          <img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-thumb" loading="lazy">
+        {% endif %}
         <div>
           <p class="meta">{{ post.created_at }}</p>
           <h2><a href="{{ url_for('post_detail', post_id=post.id) }}" class="post-link">{{ post.title }}</a></h2>
@@ -20,11 +66,40 @@
         </div>
       </article>
     {% endfor %}
-  {% else %}
-    <div class="card empty">
+  </section>
+  {% endif %}
+{% else %}
+  <div class="card empty">
+    {% if query %}
+      <p>"{{ query }}" 검색 결과가 없습니다.</p>
+    {% else %}
       <p>아직 게시글이 없습니다. 첫 글을 작성해보세요.</p>
       <a href="{{ url_for('new_post') }}" class="btn btn-primary">글쓰기</a>
-    </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% if total_pages > 1 %}
+<nav class="pagination">
+  {% if page > 1 %}
+    <a href="{{ url_for('list_posts', page=page-1, q=query, sort=sort, view=view) }}" class="btn btn-ghost">&larr; 이전</a>
+  {% else %}
+    <span class="btn btn-ghost disabled">&larr; 이전</span>
   {% endif %}
-</section>
+
+  {% for p in range(1, total_pages + 1) %}
+    {% if p == page %}
+      <span class="btn btn-primary">{{ p }}</span>
+    {% else %}
+      <a href="{{ url_for('list_posts', page=p, q=query, sort=sort, view=view) }}" class="btn btn-ghost">{{ p }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if page < total_pages %}
+    <a href="{{ url_for('list_posts', page=page+1, q=query, sort=sort, view=view) }}" class="btn btn-ghost">다음 &rarr;</a>
+  {% else %}
+    <span class="btn btn-ghost disabled">다음 &rarr;</span>
+  {% endif %}
+</nav>
+{% endif %}
 {% endblock %}

@@ -9,6 +9,7 @@ app = Flask(__name__, instance_relative_config=True)
 database_path = os.environ.get("DATABASE_PATH")
 app.config["DATABASE"] = Path(database_path) if database_path else Path(app.instance_path) / "board.db"
 app.secret_key = os.environ.get("SECRET_KEY", "dev")
+PER_PAGE = 10
 
 
 def get_db():
@@ -45,12 +46,45 @@ def ensure_database_exists():
         init_db()
 
 
+ORDER_MAP = {
+    "newest": "id DESC",
+    "oldest": "id ASC",
+    "title": "title ASC",
+}
+
+
 @app.route("/")
 def list_posts():
-    posts = get_db().execute(
-        "SELECT id, title, content, created_at FROM posts ORDER BY id DESC"
-    ).fetchall()
-    response = make_response(render_template("posts/list.html", posts=posts))
+    page = request.args.get("page", 1, type=int)
+    query = request.args.get("q", "").strip()
+    sort = request.args.get("sort", "newest")
+    view = request.args.get("view", "list")
+    if view not in ("list", "card"):
+        view = "list"
+    if sort not in ORDER_MAP:
+        sort = "newest"
+    order = ORDER_MAP[sort]
+    db = get_db()
+    if query:
+        like = f"%{query}%"
+        total = db.execute(
+            "SELECT COUNT(*) FROM posts WHERE title LIKE ? OR content LIKE ?", (like, like)
+        ).fetchone()[0]
+        posts = db.execute(
+            f"SELECT id, title, content, image_url, created_at FROM posts WHERE title LIKE ? OR content LIKE ? ORDER BY {order} LIMIT ? OFFSET ?",
+            (like, like, PER_PAGE, (page - 1) * PER_PAGE),
+        ).fetchall()
+    else:
+        total = db.execute("SELECT COUNT(*) FROM posts").fetchone()[0]
+        posts = db.execute(
+            f"SELECT id, title, content, image_url, created_at FROM posts ORDER BY {order} LIMIT ? OFFSET ?",
+            (PER_PAGE, (page - 1) * PER_PAGE),
+        ).fetchall()
+    total_pages = max(1, (total + PER_PAGE - 1) // PER_PAGE)
+    page = max(1, min(page, total_pages))
+    response = make_response(
+        render_template("posts/list.html", posts=posts, page=page, total_pages=total_pages, query=query, sort=sort, view=view)
+    )
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -59,7 +93,7 @@ def list_posts():
 
 def get_post_or_404(post_id):
     post = get_db().execute(
-        "SELECT id, title, content, created_at FROM posts WHERE id = ?",
+        "SELECT id, title, content, image_url, created_at FROM posts WHERE id = ?",
         (post_id,),
     ).fetchone()
     if post is None:
@@ -67,12 +101,12 @@ def get_post_or_404(post_id):
     return post
 
 
-def save_post(title, content):
+def save_post(title, content, image_url=""):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M")
     db = get_db()
     db.execute(
-        "INSERT INTO posts (title, content, created_at) VALUES (?, ?, ?)",
-        (title, content, created_at),
+        "INSERT INTO posts (title, content, image_url, created_at) VALUES (?, ?, ?, ?)",
+        (title, content, image_url, created_at),
     )
     db.commit()
 
@@ -85,12 +119,13 @@ def new_post():
 
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
+    image_url = request.form.get("image_url", "").strip()
 
     if not title and not content:
         flash("제목 또는 내용을 입력해 주세요.")
         return render_template(
             "posts/create.html",
-            post={"title": title, "content": content},
+            post={"title": title, "content": content, "image_url": image_url},
             form_action=url_for("new_post"),
             submit_label="Publish",
         ), 400
@@ -98,7 +133,7 @@ def new_post():
     if not title:
         title = "(제목 없음)"
 
-    save_post(title, content)
+    save_post(title, content, image_url)
     flash("게시글이 등록되었습니다.")
     return redirect(url_for("list_posts"))
 
@@ -125,6 +160,7 @@ def update_post(post_id):
     get_post_or_404(post_id)
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
+    image_url = request.form.get("image_url", "").strip()
 
     if not title and not content:
         flash("제목 또는 내용을 입력해 주세요.")
@@ -135,8 +171,8 @@ def update_post(post_id):
 
     db = get_db()
     db.execute(
-        "UPDATE posts SET title = ?, content = ? WHERE id = ?",
-        (title, content, post_id),
+        "UPDATE posts SET title = ?, content = ?, image_url = ? WHERE id = ?",
+        (title, content, image_url, post_id),
     )
     db.commit()
     flash("게시글이 수정되었습니다.")
